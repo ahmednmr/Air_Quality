@@ -33,56 +33,56 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 LSS += \
-test_machine_state.lss \
+Air_Quality_Atmega32.lss \
 
 FLASH_IMAGE += \
-test_machine_state.hex \
+Air_Quality_Atmega32.hex \
 
 EEPROM_IMAGE += \
-test_machine_state.eep \
+Air_Quality_Atmega32.eep \
 
 SIZEDUMMY += \
 sizedummy \
 
 
 # All Target
-all: test_machine_state.elf secondary-outputs
+all: Air_Quality_Atmega32.elf secondary-outputs
 
 # Tool invocations
-test_machine_state.elf: $(OBJS) $(USER_OBJS)
+Air_Quality_Atmega32.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: AVR C Linker'
-	avr-gcc -Wl,-Map,test_machine_state.map -mmcu=atmega32 -o "test_machine_state.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	avr-gcc -Wl,-Map,Air_Quality_Atmega32.map -mmcu=atmega32 -o "Air_Quality_Atmega32.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-test_machine_state.lss: test_machine_state.elf
+Air_Quality_Atmega32.lss: Air_Quality_Atmega32.elf
 	@echo 'Invoking: AVR Create Extended Listing'
-	-avr-objdump -h -S test_machine_state.elf  >"test_machine_state.lss"
+	-avr-objdump -h -S Air_Quality_Atmega32.elf  >"Air_Quality_Atmega32.lss"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-test_machine_state.hex: test_machine_state.elf
+Air_Quality_Atmega32.hex: Air_Quality_Atmega32.elf
 	@echo 'Create Flash image (ihex format)'
-	-avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex test_machine_state.elf  "test_machine_state.hex"
+	-avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex Air_Quality_Atmega32.elf  "Air_Quality_Atmega32.hex"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-test_machine_state.eep: test_machine_state.elf
+Air_Quality_Atmega32.eep: Air_Quality_Atmega32.elf
 	@echo 'Create eeprom image (ihex format)'
-	-avr-objcopy -j .eeprom --no-change-warnings --change-section-lma .eeprom=0 -O ihex test_machine_state.elf  "test_machine_state.eep"
+	-avr-objcopy -j .eeprom --no-change-warnings --change-section-lma .eeprom=0 -O ihex Air_Quality_Atmega32.elf  "Air_Quality_Atmega32.eep"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-sizedummy: test_machine_state.elf
+sizedummy: Air_Quality_Atmega32.elf
 	@echo 'Invoking: Print Size'
-	-avr-size --format=avr --mcu=atmega32 test_machine_state.elf
+	-avr-size --format=avr --mcu=atmega32 Air_Quality_Atmega32.elf
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(FLASH_IMAGE)$(ELFS)$(OBJS)$(ASM_DEPS)$(EEPROM_IMAGE)$(S_DEPS)$(SIZEDUMMY)$(S_UPPER_DEPS)$(LSS)$(C_DEPS) test_machine_state.elf
+	-$(RM) $(FLASH_IMAGE)$(ELFS)$(OBJS)$(ASM_DEPS)$(EEPROM_IMAGE)$(S_DEPS)$(SIZEDUMMY)$(S_UPPER_DEPS)$(LSS)$(C_DEPS) Air_Quality_Atmega32.elf
 	-@echo ' '
 
 secondary-outputs: $(LSS) $(FLASH_IMAGE) $(EEPROM_IMAGE) $(SIZEDUMMY)

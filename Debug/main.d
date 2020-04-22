@@ -1,24 +1,23 @@
-main.o main.o: ../main.c ../main.h ../APP/state_machine.h \
-  ../MCAL/EF_UART.h ../MCAL/EF_UART_cfg.h \
-  ../MCAL/../ServiceLayer/std_types.h ../MCAL/EF_I2C.h ../MCAL/EF_DIO.h \
-  ../HAL/EF_LCD.h ../HAL/../ServiceLayer/std_types.h ../HAL/CS811.h
+main.o main.o: ../main.c ../main.h ../APP/state_machine.h ../MCAL/i2c.h \
+  ../MCAL/UART.h ../HAL/EF_LCD.h ../HAL/../ServiceLayer/std_types.h \
+  ../HAL/CS811.h ../HAL/ESP_8266.h ../HAL/../MCAL/UART.h ../HAL/EF_LCD.h
 
 ../main.h:
 
 ../APP/state_machine.h:
 
-../MCAL/EF_UART.h:
+../MCAL/i2c.h:
 
-../MCAL/EF_UART_cfg.h:
-
-../MCAL/../ServiceLayer/std_types.h:
-
-../MCAL/EF_I2C.h:
-
-../MCAL/EF_DIO.h:
+../MCAL/UART.h:
 
 ../HAL/EF_LCD.h:
 
 ../HAL/../ServiceLayer/std_types.h:
 
 ../HAL/CS811.h:
+
+../HAL/ESP_8266.h:
+
+../HAL/../MCAL/UART.h:
+
+../HAL/EF_LCD.h:

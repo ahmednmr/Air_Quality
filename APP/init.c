@@ -10,77 +10,110 @@
 ret_state init_fun(void)
 {
 
-	char data1=0,data2=0,data3=0,data4=0,Status=0,First_Reading=TRUE;
+	unsigned char data1=0,data2=0,data3=0,data4=0,ERROR_ID,RAW_DATA1,RAW_DATA2,First_Reading=TRUE,Status=0;
+
 	unsigned int CO2=0,TVOC=0;
 	unsigned long int i=0,CO2_AVG;
-	DDRD |=(1<<PD5);
-	UART_INIT();
-	EF_void_LCD_init();
 
+	sei();
+
+	DDRD |=(1<<PD5);
+
+	EF_void_LCD_init();
+	ESP_init();
+
+	TWI_Init();
 
 	EF_void_LCD_Clear_Screen();
 	EF_void_LCD_print((unsigned char*)"Init state");
 	_delay_ms(2000);
 
-	EF_void_I2C_Init();
 
 
 
-	EF_void_UART_SendString((U8_t *)"ATE1\r\n");
-	EF_void_LCD_Clear_Screen();
-	EF_void_LCD_print((unsigned char*)"Enable EChO");
-	_delay_ms(3000);
+	ESP_Echo_Enable(FALSE);
 
-	EF_void_UART_SendString((U8_t *)"AT+CWMODE=3\r\n");
-	EF_void_LCD_Clear_Screen();
-	EF_void_LCD_print((unsigned char*)"ESP as Client");
-	_delay_ms(3000);
+	ESP_Work_Mode(BOTH);
 
-	EF_void_UART_SendString((U8_t *)"AT+CIPMUX=0\r\n");
-	EF_void_LCD_Clear_Screen();
-	EF_void_LCD_print((unsigned char*)"Single Channel");
-	_delay_ms(3000);
 
-	EF_void_UART_SendString((U8_t *)"AT+CIPMODE=0\r\n");
-	EF_void_LCD_Clear_Screen();
-	EF_void_LCD_print((unsigned char*)"Normal Mode");
-	_delay_ms(3000);
+	ESP_Multiple_Connections_Enable(FALSE);
 
-	EF_void_UART_SendString((U8_t *)"AT+CWJAP_DEF=\"ahmed\",\"135792468\"\r\n");
-	EF_void_LCD_Clear_Screen();
-	EF_void_LCD_print((unsigned char*)"Connect to Wifi");
-	_delay_ms(3000);
-	_delay_ms(3000);
-	_delay_ms(3000);
-	_delay_ms(3000);
+	ESP_transmission_Mode(NORMAL);
 
+
+	//	if(ESP_check_connection()==FALSE)
+	//	{
+	//    ESP_connect_to_WIFI(WIFI_USER_NAME,WIFI_PASSWORD);
+	//	}
+	//
+	//    ESP_OPEN_SOCKET(ThingSpeak_SERVER,ThingSpeak_PORT);
+	//
+	//    ESP_uploade_data(CO2);
+
+	//    ESP_CLOSE_SOCKET();
+
+
+
+
+	// read HW ID
+
+	TWI_Start();
+	TWI_SendData(0b10110110);
+	TWI_SendData(0x20);
+	TWI_Stop();
+
+	TWI_Start();
+	TWI_SendData(0b10110111);
+	TWI_ReceiveData_NACK(&Status);
+	TWI_Stop();
+
+	_delay_ms(100);
+
+	// read HW ID
+
+	_delay_ms(1000);
+	TWI_Start();
+	TWI_SendData(0b10110110);
+	TWI_SendData(0x00);
+	TWI_Stop();
+
+	TWI_Start();
+	TWI_SendData(0b10110111);
+	TWI_ReceiveData_NACK(&Status);
+	TWI_Stop();
+
+	_delay_ms(1000);
+
+
+
+
+	TWI_Start();
+	TWI_SendData(0b10110110);
+	TWI_SendData(0xF4);
+	TWI_Stop();
 
 
 
 	_delay_ms(1000);
-	EF_void_I2C_Start();
-	EF_void_I2C_Write(Sensor_Write_ADD);
-	EF_void_I2C_Write(Status_Register);
-	EF_void_I2C_Stop();
 
-	EF_void_I2C_Start();
-	EF_void_I2C_Write(Sensor_Read_ADD);
-	Status=EF_U8_I2C_Read_Byte(0);
-	EF_void_I2C_Stop();
+	TWI_Start();
+	TWI_SendData(0b10110110);
+	TWI_SendData(0x00);
+	TWI_Stop();
 
-	_delay_ms(100);
+	TWI_Start();
+	TWI_SendData(0b10110111);
+	TWI_ReceiveData_NACK(&Status);
+	TWI_Stop();
 
-	EF_void_I2C_Start();
-	EF_void_I2C_Write(Sensor_Write_ADD);
-	EF_void_I2C_Write(APP_Start);
-	EF_void_I2C_Stop();
 
-	_delay_ms(100);
-	EF_void_I2C_Start();
-	EF_void_I2C_Write(Sensor_Write_ADD);
-	EF_void_I2C_Write(Measurment_Mode_Register);
-	EF_void_I2C_Write(0b00100000);
-	EF_void_I2C_Stop();
+	_delay_ms(1000);
+
+	TWI_Start();
+	TWI_SendData(0b10110110);
+	TWI_SendData(0x01);
+	TWI_SendData(0b00100000);
+	TWI_Stop();
 
 
 	EF_void_LCD_Clear_Screen();
@@ -90,37 +123,41 @@ ret_state init_fun(void)
 
 
 
-		EF_void_I2C_Start();
-		EF_void_I2C_Write(Sensor_Write_ADD);
-		EF_void_I2C_Write(Status_Register);
-		EF_void_I2C_Stop();
+		TWI_Start();
+		TWI_SendData(0b10110110);
+		TWI_SendData(0x00);
+		TWI_Stop();
 
-		EF_void_I2C_Start();
-		EF_void_I2C_Write(Sensor_Read_ADD);
-		Status=EF_U8_I2C_Read_Byte(0);
-		EF_void_I2C_Stop();
+		TWI_Start();
+		TWI_SendData(0b10110111);
+		TWI_ReceiveData_NACK(&Status);
+		TWI_Stop();
+
+
 
 		if(Status==152)
 		{
+			CO2=0;
+			data1=0;data2=0;data3=0;data4=0;
 
-			EF_void_LCD_Clear_Screen();
-			EF_void_I2C_Start();
-			EF_void_I2C_Write(Sensor_Write_ADD);
-			EF_void_I2C_Write(AlG_Result_Register);
-			EF_void_I2C_Stop();
+			//			_delay_ms(100);
+			TWI_Start();
+			TWI_SendData(0b10110110);
+			TWI_SendData(0x02);
+			TWI_Stop();
 
-			EF_void_I2C_Start();
-			EF_void_I2C_Write(Sensor_Read_ADD);
-			data1=EF_U8_I2C_Read_Byte(1);
-			data2=EF_U8_I2C_Read_Byte(1);
-			data3=EF_U8_I2C_Read_Byte(1);
-			data4=EF_U8_I2C_Read_Byte(1);
-			Status=EF_U8_I2C_Read_Byte(0);
+			TWI_Start();
+			TWI_SendData(0b10110111);
+			TWI_ReceiveData_ACK(&data1);
+			TWI_ReceiveData_ACK(&data2);
+			TWI_ReceiveData_ACK(&data3);
+			TWI_ReceiveData_ACK(&data4);
+			TWI_ReceiveData_ACK(&Status);
+			TWI_ReceiveData_ACK(&ERROR_ID);
+			TWI_ReceiveData_ACK(&RAW_DATA1);
+			TWI_ReceiveData_NACK(&RAW_DATA2);
 
-			EF_void_I2C_Stop();
-
-
-
+			TWI_Stop();
 
 			CO2=data1*256;
 			CO2+=data2;
@@ -129,7 +166,7 @@ ret_state init_fun(void)
 			TVOC=data3*256;
 			TVOC+=data4;
 
-
+			EF_void_LCD_Clear_Screen();
 			EF_void_LCD_print((unsigned char*)"CO2 = ");
 			EF_void_LCD_print_Number(CO2);
 
@@ -142,37 +179,23 @@ ret_state init_fun(void)
 			CO2_AVG+=CO2;
 			i++;
 
-			if((i%360==0)&&(First_Reading==FALSE))
+			if((i%90==0)&&(First_Reading==FALSE))
 			{
-				EF_void_UART_SendString((U8_t *)"AT+CWJAP_DEF=\"ahmed\",\"135792468\"\r\n");
-				EF_void_LCD_Clear_Screen();
-				EF_void_LCD_print((unsigned char*)"Connect to Wifi");
-				_delay_ms(3000);
-				_delay_ms(3000);
-				_delay_ms(3000);
-				_delay_ms(3000);
 
 
-
-				EF_void_UART_SendString((U8_t *)"AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80\r\n");
-				EF_void_LCD_Clear_Screen();
-				EF_void_LCD_print((unsigned char*)"Connect to");
-				EF_void_LCD_Newline();
-				EF_void_LCD_print((unsigned char*)"ThingSpeak");
-				_delay_ms(4000);
+				CO2=CO2_AVG/90;
 
 
-				EF_void_UART_SendString((U8_t *)"AT+CIPSEND=50\r\n");
-				EF_void_LCD_Clear_Screen();
-				EF_void_LCD_print((unsigned char*)"Uploading Data");
+				if(ESP_check_connection()==FALSE)
+				{
+					ESP_connect_to_WIFI(WIFI_USER_NAME,WIFI_PASSWORD);
+				}
 
-				_delay_ms(3000);
+				ESP_OPEN_SOCKET(ThingSpeak_SERVER,ThingSpeak_PORT);
 
-				CO2=CO2_AVG/360;
+				ESP_uploade_data(CO2);
 
-				EF_void_UART_SendString((U8_t *)"GET /update?api_key=SD5OBD49N5H4O8RY&field2=");
-				EF_void_UART_Send_CO2(CO2);
-				EF_void_UART_SendString((U8_t *)"\r\n");
+
 
 				EF_void_LCD_Clear_Screen();
 				EF_void_LCD_print((unsigned char*)"Done UPloading");

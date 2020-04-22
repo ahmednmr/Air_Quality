@@ -1,25 +1,26 @@
 APP/init.o APP/init.o: ../APP/init.c ../APP/../main.h \
-  ../APP/../APP/state_machine.h ../APP/../MCAL/EF_UART.h \
-  ../APP/../MCAL/EF_UART_cfg.h ../APP/../MCAL/../ServiceLayer/std_types.h \
-  ../APP/../MCAL/EF_I2C.h ../APP/../MCAL/EF_DIO.h ../APP/../HAL/EF_LCD.h \
-  ../APP/../HAL/../ServiceLayer/std_types.h ../APP/../HAL/CS811.h
+  ../APP/../APP/state_machine.h ../APP/../MCAL/i2c.h \
+  ../APP/../MCAL/UART.h ../APP/../HAL/EF_LCD.h \
+  ../APP/../HAL/../ServiceLayer/std_types.h ../APP/../HAL/CS811.h \
+  ../APP/../HAL/ESP_8266.h ../APP/../HAL/../MCAL/UART.h \
+  ../APP/../HAL/EF_LCD.h
 
 ../APP/../main.h:
 
 ../APP/../APP/state_machine.h:
 
-../APP/../MCAL/EF_UART.h:
+../APP/../MCAL/i2c.h:
 
-../APP/../MCAL/EF_UART_cfg.h:
-
-../APP/../MCAL/../ServiceLayer/std_types.h:
-
-../APP/../MCAL/EF_I2C.h:
-
-../APP/../MCAL/EF_DIO.h:
+../APP/../MCAL/UART.h:
 
 ../APP/../HAL/EF_LCD.h:
 
 ../APP/../HAL/../ServiceLayer/std_types.h:
 
 ../APP/../HAL/CS811.h:
+
+../APP/../HAL/ESP_8266.h:
+
+../APP/../HAL/../MCAL/UART.h:
+
+../APP/../HAL/EF_LCD.h:

@@ -31,7 +31,6 @@
 
 #include <string.h>
 #include "EF_LCD.h"
-#include "../MCAL/EF_DIO.h"
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdlib.h>

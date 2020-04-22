@@ -10,15 +10,16 @@
 
 #include"APP/state_machine.h"
 
+
+
 #include<avr/io.h>
 #include<util/delay.h>
 
-#include"MCAL/EF_UART.h"
-#include"MCAL/EF_I2C.h"
+#include"MCAL/i2c.h"
+#include"MCAL/UART.h"
 #include"HAL/EF_LCD.h"
 #include"HAL/CS811.h"
-
-
+#include"HAL/ESP_8266.h"
 
 
 
