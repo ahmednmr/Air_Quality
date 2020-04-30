@@ -6,7 +6,6 @@
  */
 #include"main.h"
 
-#include "avr/io.h"
 
 
 ret_state return_state;

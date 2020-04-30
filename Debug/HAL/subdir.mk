@@ -6,17 +6,20 @@
 C_SRCS += \
 ../HAL/CS811.c \
 ../HAL/EF_LCD.c \
-../HAL/ESP_8266.c 
+../HAL/ESP_8266.c \
+../HAL/temp_sensor_lm35.c 
 
 OBJS += \
 ./HAL/CS811.o \
 ./HAL/EF_LCD.o \
-./HAL/ESP_8266.o 
+./HAL/ESP_8266.o \
+./HAL/temp_sensor_lm35.o 
 
 C_DEPS += \
 ./HAL/CS811.d \
 ./HAL/EF_LCD.d \
-./HAL/ESP_8266.d 
+./HAL/ESP_8266.d \
+./HAL/temp_sensor_lm35.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

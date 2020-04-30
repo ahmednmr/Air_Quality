@@ -12,31 +12,45 @@
 char  Rec_Data[DEFAULT_BUFFER_SIZE];
 char  Counter=0;
 
-
 void ESP_init(void)
 {
 	init_UART();
 	Set_Call_Back_fun(REC_from_interrupt);
 	Clear_REC_Buffer();
 
+	timer_create(wifi_module_timer_ID,wifi_module_timer_time_OUT);
+
+
+	ESP_Echo_Enable(FALSE);
+	ESP_Work_Mode(BOTH);
+	ESP_Multiple_Connections_Enable(FALSE);
+	ESP_transmission_Mode(NORMAL);
+
+	if(ESP_check_connection()==FALSE)
+	{
+		ESP_connect_to_WIFI(WIFI_USER_NAME,WIFI_PASSWORD);
+	}
+
 }
 
 void ESP_Echo_Enable(BOOLEAN Choose)
 {
+	Clear_REC_Buffer();
+
 	if(Choose==TRUE)
 	{
 		UART_SEND_string("ATE1\r\n");
 	}
-
 	else if(Choose==FALSE)
 	{
 		UART_SEND_string( "ATE0\r\n");
 	}
 
-	while(!((Check_Respond("\r\nOK\r\n"))||(Check_Respond("ATE0\r\r\n\r\nOK\r\n"))))
-	{
-		_delay_ms(1);
-	}
+	timer_reset(wifi_module_timer_ID);
+	timer_start(wifi_module_timer_ID);
+	while((!(timer_check(wifi_module_timer_ID)))&&(!((Check_Respond("\r\nOK\r\n"))||(Check_Respond("ATE0\r\r\n\r\nOK\r\n")))));
+	timer_stop(wifi_module_timer_ID);
+
 
 #if	Enable_LCD_debug
 	EF_void_LCD_Clear_Screen();
@@ -49,6 +63,7 @@ void ESP_Echo_Enable(BOOLEAN Choose)
 
 void ESP_Work_Mode(U8_t work_mode)
 {
+	Clear_REC_Buffer();
 	if(work_mode==CLIENT)
 	{
 		UART_SEND_string( "AT+CWMODE=1\r\n");
@@ -62,10 +77,13 @@ void ESP_Work_Mode(U8_t work_mode)
 		UART_SEND_string( "AT+CWMODE=3\r\n");
 	}
 
-	while(!Check_Respond("\r\nOK\r\n"))
-	{
-		_delay_ms(1);
-	}
+	timer_reset(wifi_module_timer_ID);
+	timer_start(wifi_module_timer_ID);
+	while((!(timer_check(wifi_module_timer_ID)))&&(!Check_Respond("\r\nOK\r\n")));
+
+	timer_stop(wifi_module_timer_ID);
+
+
 #if	Enable_LCD_debug
 	EF_void_LCD_Clear_Screen();
 	EF_void_LCD_print((unsigned char*)"ESP Work Mode");
@@ -80,6 +98,7 @@ void ESP_Work_Mode(U8_t work_mode)
 void ESP_Multiple_Connections_Enable(BOOLEAN Choose)
 {
 
+Clear_REC_Buffer();
 	if(Choose==TRUE)
 	{
 		UART_SEND_string( "AT+CIPMUX=1\r\n");
@@ -89,10 +108,15 @@ void ESP_Multiple_Connections_Enable(BOOLEAN Choose)
 		UART_SEND_string( "AT+CIPMUX=0\r\n");
 	}
 
-	while(!Check_Respond("\r\nOK\r\n"))
-	{
-		_delay_ms(1);
-	}
+
+	timer_reset(wifi_module_timer_ID);
+	timer_start(wifi_module_timer_ID);
+	while((!(timer_check(wifi_module_timer_ID)))&&(!Check_Respond("\r\nOK\r\n")));
+
+	timer_stop(wifi_module_timer_ID);
+
+
+
 #if	Enable_LCD_debug
 	EF_void_LCD_Clear_Screen();
 	EF_void_LCD_print((unsigned char*)"Multiple Connections");
@@ -107,6 +131,7 @@ void ESP_Multiple_Connections_Enable(BOOLEAN Choose)
 void ESP_transmission_Mode(U8_t transmission_Mode)
 {
 
+Clear_REC_Buffer();
 	if(transmission_Mode==NORMAL)
 	{
 		UART_SEND_string( "AT+CIPMODE=0\r\n");
@@ -116,11 +141,13 @@ void ESP_transmission_Mode(U8_t transmission_Mode)
 		UART_SEND_string( "AT+CIPMODE=1\r\n");
 	}
 
-	while(!Check_Respond("\r\nOK\r\n"))
-	{
-		_delay_ms(1);
+	timer_reset(wifi_module_timer_ID);
+	timer_start(wifi_module_timer_ID);
+	while((!(timer_check(wifi_module_timer_ID)))&&(!Check_Respond("\r\nOK\r\n")));
 
-	}
+	timer_stop(wifi_module_timer_ID);
+
+
 #if	Enable_LCD_debug
 	EF_void_LCD_Clear_Screen();
 	EF_void_LCD_print((unsigned char*)"transmission Mode");
@@ -134,26 +161,26 @@ void ESP_transmission_Mode(U8_t transmission_Mode)
 BOOLEAN ESP_check_connection(void)
 {
 
+    Clear_REC_Buffer();
 	UART_SEND_string( "AT+CIPSTATUS\r\n");
 
-	while(!Check_Word_in_Respond("STATUS"))
-	{
-		_delay_ms(1);
-	}
+
+	timer_reset(wifi_module_timer_ID);
+	timer_start(wifi_module_timer_ID);
+	while((!(timer_check(wifi_module_timer_ID)))&&(!Check_Word_in_Respond("STATUS")));
+
+	timer_stop(wifi_module_timer_ID);
 
 	_delay_ms(50);
 
 	if(Check_Respond(":2\r\n"))
 	{
-		Clear_REC_Buffer();
 		return TRUE;
 	}
 	else
 	{
-		Clear_REC_Buffer();
 		return FALSE;
 	}
-
 
 }
 
@@ -161,6 +188,7 @@ BOOLEAN ESP_check_connection(void)
 void ESP_connect_to_WIFI(char* USER_NAME,char* PASSWORD)
 {
 
+Clear_REC_Buffer();
 	UART_SEND_string( "AT+CWJAP=\"");
 	UART_SEND_string( USER_NAME);
 	UART_SEND_string( "\",\"");
@@ -169,11 +197,13 @@ void ESP_connect_to_WIFI(char* USER_NAME,char* PASSWORD)
 
 
 
-	while(!((Check_Respond("WIFI DISCONNECT\r\nWIFI CONNECTED\r\nWIFI GOT IP\r\n\r\nOK\r\n"))||(Check_Respond("WIFI CONNECTED\r\nWIFI GOT IP\r\n\r\nOK\r\n"))||Check_Respond("\r\nOK\r\n")))
-	{
-		_delay_ms(1);
 
-	}
+	timer_reset(wifi_module_timer_ID);
+	timer_start(wifi_module_timer_ID);
+	while((!(timer_check(wifi_module_timer_ID)))&&(!((Check_Respond("WIFI DISCONNECT\r\nWIFI CONNECTED\r\nWIFI GOT IP\r\n\r\nOK\r\n"))||(Check_Respond("WIFI CONNECTED\r\nWIFI GOT IP\r\n\r\nOK\r\n"))||Check_Respond("\r\nOK\r\n"))));
+
+	timer_stop(wifi_module_timer_ID);
+
 
 #if	Enable_LCD_debug
 	EF_void_LCD_Clear_Screen();
@@ -188,16 +218,22 @@ void ESP_connect_to_WIFI(char* USER_NAME,char* PASSWORD)
 void  ESP_OPEN_SOCKET(char* SERVER_IP,char* SERVER_PORT)
 {
 
+	Clear_REC_Buffer();
 	UART_SEND_string( "AT+CIPSTART=\"TCP\",\"");
 	UART_SEND_string( SERVER_IP);
 	UART_SEND_string( "\",");
 	UART_SEND_string( SERVER_PORT);
 	UART_SEND_string( "\r\n");
 
-	while(!Check_Respond("CONNECT\r\n\r\nOK\r\n"))
-	{
-		_delay_ms(1);
-	}
+
+
+
+	timer_reset(wifi_module_timer_ID);
+	timer_start(wifi_module_timer_ID);
+	while((!(timer_check(wifi_module_timer_ID)))&&(!Check_Respond("CONNECT\r\n\r\nOK\r\n")));
+
+	timer_stop(wifi_module_timer_ID);
+
 
 #if	Enable_LCD_debug
 	EF_void_LCD_Clear_Screen();
@@ -213,31 +249,49 @@ void  ESP_OPEN_SOCKET(char* SERVER_IP,char* SERVER_PORT)
 }
 
 
-void ESP_uploade_data(unsigned int data)
+void ESP_uploade_data(unsigned int field,unsigned int data)
 {
-	char api_buffer[50]={0},send_length_buffer[20]={0},api_length=0;
+	char api_buffer[50]={0},send_length_buffer[20]={0};
 
 
-	sprintf(api_buffer, "GET /update?api_key=SD5OBD49N5H4O8RY&field2=%d\r\n", data);
 
-	api_length=strlen(api_buffer);
+	if(ESP_check_connection()==FALSE)
+	{
+		ESP_connect_to_WIFI(WIFI_USER_NAME,WIFI_PASSWORD);
+	}
 
-	sprintf(send_length_buffer, "AT+CIPSEND=%d\r\n", api_length);
+	ESP_OPEN_SOCKET(ThingSpeak_SERVER,ThingSpeak_PORT);
 
 
+
+	sprintf(api_buffer, "GET /update?api_key=SD5OBD49N5H4O8RY&field%d=%d\r\n",field, data);
+
+	memset(send_length_buffer,0,20);
+	sprintf(send_length_buffer, "AT+CIPSEND=%d\r\n", strlen(api_buffer));
+
+	Clear_REC_Buffer();
 	UART_SEND_string( send_length_buffer);
 
-	while(!Check_Respond("\r\nOK\r\n> "))
-	{
-		_delay_ms(1);
-	}
 
-	UART_SEND_string( api_buffer);
+	timer_reset(wifi_module_timer_ID);
+	timer_start(wifi_module_timer_ID);
+	while((!(timer_check(wifi_module_timer_ID)))&&(!Check_Respond("\r\nOK\r\n> ")));
 
-	while(!Check_Word_in_Respond("+IPD"))
-	{
-		_delay_ms(1);
-	}
+	timer_stop(wifi_module_timer_ID);
+
+
+
+	memset(api_buffer,0,50);
+	sprintf(api_buffer, "GET /update?api_key=SD5OBD49N5H4O8RY&field%d=%d\r\n",field, data);
+	Clear_REC_Buffer();
+	UART_SEND_string(api_buffer);
+
+
+	timer_reset(wifi_module_timer_ID);
+	timer_start(wifi_module_timer_ID);
+	while((!(timer_check(wifi_module_timer_ID)))&&(!Check_Word_in_Respond("+IPD")));
+
+	timer_stop(wifi_module_timer_ID);
 
 	_delay_ms(500);
 	Clear_REC_Buffer();
@@ -248,18 +302,23 @@ void ESP_uploade_data(unsigned int data)
 	_delay_ms(2000);
 #endif
 
-
 }
+
+
 
 
 void ESP_CLOSE_SOCKET(void)
 {
-	UART_SEND_string( "AT+CIPCLOSE=0\r\n");
-	while(!Check_Respond("\r\nOK\r\n"))
-	{
-		_delay_ms(1);
 
-	}
+	Clear_REC_Buffer();
+	UART_SEND_string( "AT+CIPCLOSE=0\r\n");
+
+	timer_reset(wifi_module_timer_ID);
+	timer_start(wifi_module_timer_ID);
+	while((!(timer_check(wifi_module_timer_ID)))&&(!Check_Respond("\r\nOK\r\n")));
+
+	timer_stop(wifi_module_timer_ID);
+
 
 #if	Enable_LCD_debug
 	EF_void_LCD_Clear_Screen();

@@ -10,6 +10,7 @@
 
 
 #include "../MCAL/UART.h"
+#include"../MCAL/spechial_timer.h"
 #include "EF_LCD.h"
 #include <util/delay.h>
 #include <string.h>
@@ -17,7 +18,7 @@
 
 #define Enable_LCD_debug     0
 
-#define WIFI_USER_NAME "B68L-73EE"// "ahmed"//
+#define WIFI_USER_NAME "B68L-73EE"//"ahmed"//
 #define WIFI_PASSWORD    "7BF3260E"//"135792468"//
 
 #define ThingSpeak_SERVER      "api.thingspeak.com"
@@ -40,7 +41,7 @@ BOOLEAN ESP_check_connection(void);
 void ESP_connect_to_WIFI(char* USER_NAME,char* PASSWORD);
 
 void  ESP_OPEN_SOCKET(char* SERVER_IP,char* SERVER_PORT);
-void ESP_uploade_data(unsigned int data);
+void ESP_uploade_data(unsigned int data,unsigned int field);
 void ESP_CLOSE_SOCKET(void);
 
 char Check_Respond(char * Expected_Respond);

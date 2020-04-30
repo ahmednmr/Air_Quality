@@ -4,16 +4,25 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../MCAL/ADC.c \
 ../MCAL/UART.c \
-../MCAL/i2c.c 
+../MCAL/i2c.c \
+../MCAL/spechial_timer.c \
+../MCAL/timer.c 
 
 OBJS += \
+./MCAL/ADC.o \
 ./MCAL/UART.o \
-./MCAL/i2c.o 
+./MCAL/i2c.o \
+./MCAL/spechial_timer.o \
+./MCAL/timer.o 
 
 C_DEPS += \
+./MCAL/ADC.d \
 ./MCAL/UART.d \
-./MCAL/i2c.d 
+./MCAL/i2c.d \
+./MCAL/spechial_timer.d \
+./MCAL/timer.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

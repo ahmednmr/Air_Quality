@@ -109,6 +109,9 @@ void EF_void_LCD_init()
 	EF_void_LCD_send_command(0x06);            /* Command ..0x06---> Automatic Increment - No Display shift */
 	EF_void_LCD_send_command(0x80);            /* Command ..0x80---> Address DDRAM with 0 offset 80h */
 	_delay_ms(20);
+
+	EF_void_LCD_Clear_Screen();
+
 }
 
 

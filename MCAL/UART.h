@@ -14,7 +14,7 @@
 
 #define FOSC 8000000// Clock Speed
 #define BAUD 115200
-void (*ISR_fun)(void);
+void (*ISR_UART_RX_fun)(void);
 
 void init_UART(void);
 void UART_SendChar(char data);

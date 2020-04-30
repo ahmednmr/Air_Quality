@@ -68,7 +68,7 @@ void UART_SEND_number(int number)
 void Set_Call_Back_fun(void (*PTR)(void))
 {
 
-ISR_fun=PTR;
+ISR_UART_RX_fun=PTR;
 
 
 }
@@ -76,7 +76,7 @@ ISR_fun=PTR;
 ISR (USART_RXC_vect)
 {
 
-	ISR_fun();
+	ISR_UART_RX_fun();
 
 
 }
